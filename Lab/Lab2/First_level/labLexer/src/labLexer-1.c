@@ -90,6 +90,9 @@ int getRelop(char *Input, int *i)	//从第 i 位开始检测到关系运算符
 
 			case 8:
 				return G;	//读取遇到非法字符, 结束, 结果为 '>'
+				
+			default:
+				return 0;	//读入结束, 结果为空
 		}
 	}
 }
@@ -106,10 +109,13 @@ int isRelop(char c)
 int getWord(char *Input, int *i)
 {
 	int length = 0;
-	while (Input[*i] != '\0' && !isRelop(Input[*i]))	//一直读取直到读到关系运算符
+	while (Input[*i] != '\0' && !isRelop(Input[*i]))	//一直读取直到读到关系运算符 or 换行符
 	{
+		if (Input[*i] != '\n' && Input[*i] != '\r')
+		{
+			length++;
+		}
 		(*i)++;
-		length++;
 	}
 	return length;	//返回字长度
 }
@@ -125,7 +131,7 @@ const char *transRelop(int Relop)
 			return "<=";
 	
 		case NE:
-			return "!=";		// !=
+			return "<>";		// !=
 	
 		case L:
 			return "<";
@@ -141,12 +147,22 @@ const char *transRelop(int Relop)
 	}
 }
 
+void printString(char *Input, int length)
+{
+	for(int i = 0; i < length; i++)
+	{
+		printf("%d  ", Input[i]);
+	}
+	printf("\n");
+}
+
 int main()
 {
 	int i = 0;	//loop variable
 	char *Input = (char *)malloc(sizeof(char) * MAX_LENGTH);
 	memset(Input, '\0', MAX_LENGTH * sizeof(char));		// initialize
-	gets(Input);	// get input
+	fgets(Input, MAX_LENGTH, stdin);	// get input
+//	printString(Input, strlen(Input));
 
 	while (Input[i] != '\0')	//循环读取, 直到到达数组末尾
 	{
@@ -161,6 +177,7 @@ int main()
 			printf("(relop,%s)", transRelop(relop));
 		}
 	}
+	free(Input);
 
 	return 0;
 }
