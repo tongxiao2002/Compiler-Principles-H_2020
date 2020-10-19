@@ -1,0 +1,372 @@
+\documentclass{article}
+\usepackage{ctex}
+\usepackage[left=2cm,right=2cm,top=1.5cm,bottom=1.5cm]{geometry}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{multirow}
+\usepackage{makecell}
+\usepackage{float}
+\usepackage[thmmarks,amsmath]{ntheorem}
+\usepackage{hyperref}
+\usetikzlibrary{positioning, arrows.meta}
+
+\begin{document}
+	\title{HW4 - 1}
+	\author{肖桐 PB18000037}
+	\date{2020 年 10 月 17 日}
+	\maketitle
+	
+	\tikzset
+	{
+		rect1/.style = {
+    	shape = rectangle,
+    	draw = black,
+    	text width = 2.4cm,
+    	align = left,
+    	minimum height = 1cm,
+		}
+	}
+	\tikzset
+	{
+		rect2/.style = {
+    	shape = rectangle,
+    	draw = black,
+    	text width = 4cm,
+    	align = left,
+    	minimum height = 1cm,
+		}
+	}
+	\newtheorem*{solution}{解}
+
+	\begin{solution}\textnormal{\textbf{1.}}
+		(1). SLR分析表：\newline
+		首先写出对应的增广文法：\newline
+		$$
+		E' \to E
+		$$
+		$$
+		E \to E + T\ |\ T
+		$$
+		$$
+		T \to TF\ |\ F
+		$$
+		$$
+		F \to F*\ |\ a\ |\ b
+		$$
+		令$I_0 = \{E' \to E\}$, 进而得到$GOTO$图如下：\newline
+		\begin{tikzpicture}
+			\node[rect1](0) at (0, 0)
+			{
+				$I_0$\newline
+				$E' \to \cdot E$\newline
+				$E \to \cdot E + T$\newline
+				$E \to \cdot T$\newline
+				$T \to \cdot TF$\newline
+				$T \to \cdot F$\newline
+				$F \to \cdot F*$\newline
+				$F \to \cdot a$\newline
+				$F \to \cdot b$
+			};
+			\node[rect1](1) at (3.5cm, 1.7cm)
+			{
+				$I_1$\newline
+				$E' \to E\cdot$\newline
+				$E \to E \cdot + T$
+			};
+			\node[rect1, below = 1cm of 0](2)
+			{
+				$I_2$\newline
+				$E \to T\cdot$\newline
+				$T \to T\cdot F$\newline
+				$F \to \cdot F*$\newline
+				$F \to \cdot a$\newline
+				$F \to \cdot b$
+			};
+			\node[rect1, below = 1cm of 1](3)
+			{
+				$I_3$\newline
+				$T \to F\cdot$\newline
+				$F \to F\cdot *$
+			};
+			\node[rect1, below = 1cm of 3](4)
+			{
+				$I_4$\newline
+				$F \to a\cdot$
+			};
+			\node[rect1, below = 1cm of 4](5)
+			{
+				$I_5$\newline
+				$F \to b\cdot$
+			};
+			\node[rect1](6) at (7cm, 0.6cm)
+			{
+				$I_6$\newline
+				$E \to E + \cdot T$\newline
+				$T \to \cdot TF$\newline
+				$T \to \cdot F$\newline
+				$F \to \cdot F*$\newline
+				$F \to \cdot a$\newline
+				$F \to \cdot b$
+			};
+			\node[rect1, below = 1cm of 6](7)
+			{
+				$I_7$\newline
+				$F \to F*\cdot$
+			};
+			\node[rect1, below = 1cm of 2](8)
+			{
+				$I_8$\newline
+				$T \to TF\cdot$\newline
+				$F \to F\cdot *$
+			};
+			\node[rect1, right = 1cm of 6](9)
+			{
+				$I_9$\newline
+				$E \to E + T\cdot$\newline
+				$T \to T\cdot F$\newline
+				$F \to \cdot F*$\newline
+				$F \to \cdot a$\newline
+				$F \to \cdot b$
+			};
+			\draw[->] (0) -- node[above]{$E$}(1);
+			\draw[->] (0) -- node[right]{$T$}(2);
+			\draw[->] (0) -- node[above]{$F$}(3);
+			\draw[->] (0) -- node[above]{$a$}(4);
+			\draw[->] (0) -- (1.5cm, -2cm) -- node[right]{$b$}(1.5cm, -4.8cm) -- (5);
+			\draw[->] (1) -- node[above]{$+$}(6);
+			\draw[->] (6) -- node[above]{$T$}(9);
+			\draw[->] (3) -- node[above]{$*$}(7);
+			\draw[->] (2) -- node[right]{$F$}(8);
+			\draw[->] (6) -- (5.1cm, 0cm) -- node[left]{$a$}(5.1cm, -3cm) -- (4);
+			\draw[->] (6) -- (5.3cm, -1cm) -- node[right]{$b$}(5.3cm, -5cm) -- (5);
+			\draw[->] (2) -- (1.9cm, -5.4cm) -- node[right]{$a$}(1.9cm, -3.5cm) -- (4);
+			\draw[->] (2) -- (1.5cm, -6cm) -- node[below]{$b$}(5);
+			\draw[->] (8) -- node[above]{$*$}(7cm, -8.8cm) -- (7);
+			\draw[->] (9) -- node[left]{$a$}(10.6cm, -4cm) -- (4);
+			\draw[->] (9) -- node[right]{$b$}(11cm, -5cm) -- (5);
+			\draw[->] (9) -- node[right]{$F$}(12cm, -9.5cm) -- (8);
+			\draw[->] (6) -- (3.6cm, 0.6cm) -- node[left]{$F$}(3);
+		\end{tikzpicture}\newline
+		再对产生式进行编号：\newline
+		1. $E' \to E$\newline
+		2. $E \to E + T$\newline
+		3. $E \to T$\newline
+		4. $T \to TF$\newline
+		5. $T \to F$\newline
+		6. $F \to F*$\newline
+		7. $F \to a$\newline
+		8. $F \to b$\newline
+		则可以得到$SLR$分析表如下：\newline
+		\begin{table}[H]
+			\centering
+			\caption{}
+			\begin{tabular}{|c|ccccc|ccc|}
+				\hline
+				\multirow{2}*{状态} & \multicolumn{5}{|c|}{$ACTION$} & \multicolumn{3}{|c|}{$GOTO$} \\
+				\cline{2 - 9}
+									& $+$ & $*$ & $a$ & $b$ & $\$$ & $E$ & $T$ & $F$ \\
+				\hline
+				$0$ &  &  & $s4$ & $s5$ &  & $1$ & $2$ & $3$ \\
+				\hline
+				$1$ & $s6$ &  &  &  & $acc$ &  &  & \\
+				\hline
+				$2$ & $r3$ &  & $s4$ & $s5$ & $r3$ &  &  & $8$ \\
+				\hline
+				$3$ & $r5$ & $s7$ & $r5$ & $r5$ & $r5$ &  &  & \\
+				\hline
+				$4$ & $r7$ & $r7$ & $r7$ & $r7$ & $r7$ &  &  & \\
+				\hline
+				$5$ & $r8$ & $r8$ & $r8$ & $r8$ & $r8$ &  &  & \\
+				\hline
+				$6$ &  &  & $s4$ & $s5$ &  &  & $9$ & $3$ \\
+				\hline
+				$7$ & $r6$ & $r6$ & $r6$ & $r6$ & $r6$ &  &  & \\
+				\hline
+				$8$ & $r4$ & $s7$ & $r4$ & $r4$ & $r4$ &  &  & \\
+				\hline
+				$9$ & $r2$ &  & $s4$ & $s5$ & $r2$ &  &  & $8$ \\
+				\hline
+			\end{tabular}
+		\end{table}
+		(2). LALR分析表：\newline
+		先写出(1)中每个项集的内核项：\newline
+		$I_0:\ E' \to \cdot E$\newline
+		$I_1:\ E' \to E\cdot,\ E \to E\cdot + T$\newline
+		$I_2:\ E \to T\cdot,\ T \to T\cdot F$\newline
+		$I_3:\ T \to F\cdot,\ F \to F\cdot *$\newline
+		$I_4:\ F \to a\cdot$\newline
+		$I_5:\ F \to b\cdot$\newline
+		$I_6:\ E \to E + \cdot T$\newline
+		$I_7:\ F \to F*\cdot$\newline
+		$I_8:\ T \to TF\cdot,\ F \to F\cdot *$\newline
+		$I_9:\ E \to E + T\cdot,\ T \to T\cdot F$\newline
+		下面为这些内核项确定向前看符号：\newline
+		通过传播和自发生成过程可以得到各个内核项的向前看符号如下：\newline
+		$I_0:\ E' \to \cdot E, \$$\newline
+		$I_1:\ E' \to E\cdot, \$;\ E \to E \cdot + T, \$/+$\newline
+		$I_2:\ E \to T\cdot, \$/+;\ T \to T \cdot F, \$/+/a/b$\newline
+		$I_3:\ T \to F\cdot, \$/+/a/b;\ T \to F\cdot *, \$/+/*/a/b$\newline
+		$I_4:\ F \to a\cdot, \$/+/*/a/b$\newline
+		$I_5:\ F \to b\cdot, \$/+/*/a/b$\newline
+		$I_6:\ E \to E +\cdot T, \$/+$\newline
+		$I_7:\ F \to F*\cdot, \$/+/*/a/b$\newline
+		$I_8:\ T \to TF\cdot, \$/+/a/b;\ F \to F\cdot *, \$/+/*/a/b$\newline
+		$I_9:\ E \to E + T\cdot, \$/+;\ T \to T\cdot F, \$/+/a/b$\newline
+		对每个内核项作闭包可得项目集如下：
+		\begin{table}[H]
+			\centering
+			\caption{}
+			\begin{tabular}{|c|c|c|c|c|}
+				\hline
+				$I_0$ & $I_1$ & $I_2$ & $I_3$ & $I_4$ \\
+				\hline
+				$E' \to \cdot E, \$$ & $E' \to E\cdot, \$$ & $E \to T\cdot, \$/+$ & $T \to F\cdot, \$/+/a/b$ & $F \to a\cdot, \$/+/*/a/b$ \\
+
+				$E \to \cdot E + T, \$/+$ & $E \to E\cdot +T, \$/+$ & $T \to T\cdot F, \$/+/a/b$ & $T \to F\cdot *, \$/+/*/a/b$ & \\
+				
+				$E \to \cdot T, \$/+$ &  & $F \to \cdot F*, */a/b$ &  & \\
+				
+				$T \to \cdot TF, \$/+/a/b$ &  & $F \to \cdot a, */a/b$ &  & \\
+				
+				$T \to \cdot F, \$/+/a/b$ &  & $F \to \cdot b, */a/b$ &  & \\
+				
+				$F \to \cdot F*, \$/+/*/a/b$ &  &  &  & \\
+				
+				$F \to \cdot a, \$/+/*/a/b$ &  &  &  & \\
+				
+				$F \to \cdot b, \$/+/*/a/b$ &  &  &  & \\
+				\hline
+			\end{tabular}
+		\end{table}
+		\begin{table}[H]
+			\centering
+			\caption{}
+			\begin{tabular}{|c|c|c|c|}
+				\hline
+				$I_5$ & $I_6$ & $I_7$ & $I_8$ \\
+				\hline
+				$F \to b\cdot, \$/+/*/a/b$ & $E \to E+\cdot T, \$/+$ & $F \to F*\cdot, \$/+/*/a/b$ & $T \to TF\cdot, \$/+/a/b$ \\
+				
+				& $T \to \cdot TF, \$/+/a/b$ &  & $F \to F\cdot *, \$/+/*/a/b$ \\
+				
+				& $T \to \cdot F, \$/+/a/b$ &  & \\
+				
+				& $F \to \cdot F*, \$/+/*/a/b$ &  & \\
+				
+				& $F \to \cdot a, \$/+/*/a/b$ &  & \\
+				
+				& $F \to \cdot b, \$/+/*/a/b$ &  & \\
+				
+				&  &  & \\
+				
+				&  &  & \\
+				\hline
+			\end{tabular}
+		\end{table}
+		\begin{table}[H]
+			\centering
+			\caption{}
+			\begin{tabular}{|c|}
+				\hline
+				$I_9$\\
+				\hline
+				$E \to E + T\cdot, \$/+$ \\
+				
+				$T \to T\cdot F, \$/+/a/b$\\
+				
+				$F \to \cdot F*, \$/+/*/a/b$\\
+				
+				$F \to \cdot a, \$/+/*/a/b$\\
+				
+				$F \to \cdot b, \$/+/*/a/b$\\
+				\hline
+			\end{tabular}
+		\end{table}
+		产生式编号与(1)相同, 故得到$LALR(1)$分析表如下：
+		\begin{table}[H]
+			\centering
+			\caption{}
+			\begin{tabular}{|c|ccccc|ccc|}
+				\hline
+				\multirow{2}*{状态} & \multicolumn{5}{|c|}{$ACTION$} & \multicolumn{3}{|c|}{$GOTO$} \\
+				\cline{2 - 9}
+				& $+$ & $*$ & $a$ & $b$ & $\$$ & $E$ & $T$ & $F$ \\
+				\hline
+				$0$ &  &  & $s4$ & $s5$ &  & $1$ & $2$ & $3$ \\
+				\hline
+				$1$ & $s6$ &  &  &  & $acc$ &  &  &  \\
+				\hline
+				$2$ & $r3$ &  & $s4$ & $s5$ & $r3$ &  &  & $8$ \\
+				\hline
+				$3$ & $r5$ & $s7$ & $r5$ & $r5$ & $r5$ &  &  &  \\
+				\hline
+				$4$ & $r7$ & $r7$ & $r7$ & $r7$ & $r7$ &  &  &  \\
+				\hline
+				$5$ & $r8$ & $r8$ & $r8$ & $r8$ & $r8$ &  &  &  \\
+				\hline
+				$6$ &  &  & $s4$ & $s5$ &  &  & $9$ & $3$ \\
+				\hline
+				$7$ & $r6$ & $r6$ & $r6$ & $r6$ & $r6$ &  &  &  \\
+				\hline
+				$8$ & $r4$ & $s7$ & $r4$ & $r4$ & $r4$ &  &  &  \\
+				\hline
+				$9$ & $r2$ &  & $s4$ & $s5$ & $r2$ &  &  & $8$ \\
+				\hline
+			\end{tabular}
+		\end{table}
+	\end{solution}
+	\begin{solution}\textnormal{\textbf{2.}}
+		因为$FIRST(SA) = FIRST(A) = \{a\}$, 因此$FIRST(SA) \bigcap FIRST(A) = \{a\} \neq \emptyset$\newline
+		故该文法不是$LL(1)$文法.\newline
+		下面构造$LR(1)$分析表证明该文法是$LR(1)$文法.\newline
+		首先构造增广文法：
+		$$
+		S' \to S
+		$$
+		$$
+		S \to SA\ |\ A
+		$$
+		$$
+		A \to a
+		$$
+		然后从项$[S' \to S, \$]$构造出整个项集：
+		\begin{table}[H]
+			\centering
+			\caption{}
+			\begin{tabular}{|c|c|c|c|c|}
+				\hline
+				$I_0$ & $I_1$ & $I_2$ & $I_3$ & $I_4$ \\
+				\hline
+				$S' \to \cdot S, \$$ & $S' \to S\cdot, \$$ & $S \to SA\cdot, \$/a$ & $S \to A\cdot, \$/a$ & $A \to a\cdot, \$/a$ \\
+				$S \to \cdot SA, \$/a$ & $S \to S\cdot A, \$/a$ &  &  &  \\
+				$S \to \cdot A, \$/a$ & $A \to \cdot a, \$/a$ &  &  &  \\
+				$A \to \cdot a, \$/a$ &  &  &  &  \\
+				\hline
+			\end{tabular}
+		\end{table}
+		对各个产生式进行编号：\newline
+		1. $S' \to S$\newline
+		2. $S \to SA$\newline
+		3. $S \to A$\newline
+		4. $A \to a$\newline
+		因此对应的$LR(1)$分析表为：
+		\begin{table}[H]
+			\centering
+			\caption{}
+			\begin{tabular}{|c|cc|cc|}
+				\hline
+				\multirow{2}*{状态} & \multicolumn{2}{|c|}{$ACTION$} & \multicolumn{2}{|c|}{$GOTO$} \\
+				\cline{2 - 5}
+				& $a$ & $\$$ & $S$ & $A$ \\
+				\hline
+				$0$ & $s4$ &  & $1$ & $3$ \\
+				$1$ & $s4$ & $acc$ &  & $2$ \\
+				$2$ & $r2$ & $r2$ &  &  \\
+				$3$ & $r3$ & $r3$ &  &  \\
+				$4$ & $r4$ & $r4$ &  &  \\
+				\hline
+			\end{tabular}
+		\end{table}
+		即分析表无冲突, 因此该文法是$LR(1)$文法.
+	\end{solution}
+\end{document}
