@@ -1,0 +1,292 @@
+\documentclass{article}
+\usepackage{ctex}
+\usepackage[left=2cm,right=2cm,top=1.5cm,bottom=1.5cm]{geometry}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{multirow}
+\usepackage{makecell}
+\usepackage{float}
+\usepackage[thmmarks,amsmath]{ntheorem}
+\usepackage{hyperref}
+\usetikzlibrary{positioning, arrows.meta}
+
+\begin{document}
+	\title{HW4 - 2}
+	\author{肖桐 PB18000037}
+	\date{2020 年 10 月 18 日}
+	\maketitle
+
+	\newtheorem*{solution}{解}
+
+	\begin{solution}\textnormal{\textbf{1.}}
+		(1). 首先为每个产生式编号：\newline
+		1. $S' \to S$\newline
+		2. $S \to BB$\newline
+		3. $B \to bB$\newline
+		4. $B \to a$\newline
+		根据$GOTO$图构建分析表：
+		\begin{table}[H]
+			\centering
+			\caption{LR分析表}
+			\begin{tabular}{|c|ccc|cc|}
+				\hline
+				\multirow{2}*{状态} & \multicolumn{3}{|c|}{$ACTION$} & \multicolumn{2}{|c|}{$GOTO$} \\
+				\cline{2 - 6}
+				& $a$ & $b$ & $\$$ & $S$ & $B$ \\
+				\hline
+				$0$ & $s4$ & $s3$ &  & $1$ & $2$ \\
+				$1$ &  &  & $acc$ &  &  \\
+				$2$ & $s7$ & $s6$ &  &  & $5$ \\
+				$3$ & $s4$ & $s3$ &  &  & $8$ \\
+				$4$ & $r4$ & $r4$ &  &  &  \\
+				$5$ &  &  & $r2$ &  &  \\
+				$6$ & $s7$ & $s6$ &  &  & $9$ \\
+				$7$ &  &  & $r4$ &  &  \\
+				$8$ & $r3$ & $r3$ &  &  &  \\
+				$9$ &  &  & $r3$ &  &  \\
+				\hline
+			\end{tabular}
+		\end{table}
+		终结符串$bbabba$的$LR$分析过程为：
+		\begin{table}[H]
+			\centering
+			\caption{处理输入$bbabba$的动作表}
+			\begin{tabular}{|l|l|r|c|}
+				\hline
+				栈 & 符号 & 输入 & 动作 \\
+				\hline
+				$0$ &  & $bbabba\$$ & 移入 \\
+				$03$ & $b$ & $babba\$$ & 移入 \\
+				$033$ & $bb$ & $abba\$$ & 移入 \\
+				$0334$ & $bba$ & $bba\$$ & 根据$B \to a$归约 \\
+				$0338$ & $bbB$ & $bba\$$ & 根据$B \to bB$归约 \\
+				$038$ & $bB$ & $bba\$$ & 根据$B \to bB$归约 \\
+				$02$ & $B$ & $bba\$$ & 移入 \\
+				$026$ & $Bb$ & $ba\$$ & 移入 \\
+				$0266$ & $Bbb$ & $a\$$ & 移入 \\
+				$02667$ & $Bbba$ & $\$$ & 根据$B \to a$归约 \\
+				$02669$ & $BbbB$ & $\$$ & 根据$B \to bB$归约 \\
+				$0269$ & $BbB$ & $\$$ & 根据$B \to bB$归约 \\
+				$025$ & $BB$ & $\$$ & 根据$S \to BB$归约 \\
+				$01$ & $S$ & $\$$ & 接受 \\
+				\hline
+			\end{tabular}
+		\end{table}
+		终结符串$bba$的$LR$分析过程为：
+		\begin{table}[H]
+			\centering
+			\caption{处理输入$bba$的动作表}
+			\begin{tabular}{|l|l|r|c|}
+				\hline
+				栈 & 符号 & 输入 & 动作 \\
+				\hline
+				$0$ &  & $bba\$$ & 移入 \\
+				$03$ & $b$ & $ba\$$ & 移入 \\
+				$033$ & $bb$ & $a\$$ & 移入 \\
+				$0334$ & $bba$ & $\$$ & 报错 \\
+				\hline
+			\end{tabular}
+		\end{table}
+		因为$LR(1)$分析器能够确切地将栈顶状态与原串中对应所处的分析位置联系起来, 这样能够避免多余$/$错误的移进、规约操作.\newline
+		本题中因为后面紧跟的是$\$$, 而在当前状态下, 只有后面紧跟终结符$b/a$才能进行规约,
+		后面紧跟任何终结符都不会进行移进. 分析表中对应$\$$符号动作为空白,
+		因此不会做任何多余的规约步骤, 也不会将非法符号移入栈中, 而会马上报错.\newline
+		相对的, $LALR(1)$分析器则会将$bba$规约为$B$之后才能发现错误.\newline
+		(2). 每个产生式编号与(1)相同, 下面先构建分析表：
+		\begin{table}[H]
+			\centering
+			\caption{LR分析表}
+			\begin{tabular}{|c|ccc|cc|}
+				\hline
+				\multirow{2}*{状态} & \multicolumn{3}{|c|}{$ACTION$} & \multicolumn{2}{|c|}{$GOTO$} \\
+				\cline{2 - 6}
+				& $a$ & $b$ & $\$$ & $S$ & $B$ \\
+				\hline
+				$0$ & $s47$ & $s36$ &  & $1$ & $2$ \\
+				$1$ &  &  & $acc$ &  &  \\
+				$2$ & $s47$ & $s36$ &  &  & $5$ \\
+				$36$ & $s47$ & $s36$ &  &  & $89$ \\
+				$47$ & $r4$ & $r4$ & $r4$ &  &  \\
+				$5$ &  &  & $r2$ &  &  \\
+				$89$ & $r3$ & $r3$ & $r3$ &  &  \\
+				\hline
+			\end{tabular}
+		\end{table}
+		终结符串$bbabba$的$LR$分析过程为：
+		\begin{table}[H]
+			\centering
+			\caption{处理输入$bbabba$的动作表}
+			\begin{tabular}{|l|l|r|c|}
+				\hline
+				栈 & 符号 & 输入 & 动作 \\
+				\hline
+				$0$ &  & $bbabba\$$ & 移入 \\
+				$0(36)$ & $b$ & $babba\$$ & 移入 \\
+				$0(36)(36)$ & $bb$ & $abba\$$ & 移入 \\
+				$0(36)(36)(47)$ & $bba$ & $bba\$$ & 根据$B \to a$归约 \\
+				$0(36)(36)(89)$ & $bbB$ & $bba\$$ & 根据$B \to bB$归约 \\
+				$0(36)(89)$ & $bB$ & $bba\$$ & 根据$B \to bB$归约 \\
+				$02$ & $B$ & $bba\$$ & 移入 \\
+				$02(36)$ & $Bb$ & $ba\$$ & 移入 \\
+				$02(36)(36)$ & $Bbb$ & $a\$$ & 移入 \\
+				$02(36)(36)(47)$ & $Bbba$ & $\$$ & 根据$B \to a$归约 \\
+				$02(36)(36)(89)$ & $BbbB$ & $\$$ & 根据$B \to bB$归约 \\
+				$02(36)(89)$ & $BbB$ & $\$$ & 根据$B \to bB$归约 \\
+				$025$ & $BB$ & $\$$ & 根据$S \to BB$归约 \\
+				$01$ & $S$ & $\$$ & 接受 \\
+				\hline
+			\end{tabular}
+		\end{table}
+		与规范$LR(1)$分析区别最大的地方在于$LALR(1)$对两个$bba$子串移进、归约时所处的状态是相同的,
+		而规范$LR(1)$分析对$bba$子串进行移进、归约时所处状态不同.
+		这样的结果就是$LALR(1)$分析有时无法仅根据栈顶状态判断当前已经对原串分析到了什么地方.\newline
+		比如对上面$bbabba$串的分析, 仅从栈顶状态无法区分此时是对第一个$bba$子串进行分析, 还是对第二个$bba$子串进行分析,
+		而必须要进行一定的约归步骤之后才能看得出来. 而规范的$LR(1)$分析因为没有将同心项目合并, 可以根据不同的向前看符号分辨不同的项集, 则不存在这种问题.\newline
+		这就导致了$LALR(1)$分析的错误检测能力相较于规范的$LR(1)$分析要差一些.\newline
+	\end{solution}
+	\begin{solution}]\textnormal{\textbf{2.}}
+		(1). 对于文法：
+		$$
+		S \to aAc
+		$$
+		$$
+		A \to Abb\ |\ b
+		$$
+		写出其增广文法：
+		$$
+		S' \to S
+		$$
+		$$
+		S \to aAc
+		$$
+		$$
+		A \to Abb\ |\ b
+		$$
+		从项$[S' \to S, \$]$构造出整个项集：
+		\begin{table}[H]
+			\centering
+			\caption{}
+			\begin{tabular}{|c|c|c|c|}
+				\hline
+				$I_0$ & $I_1$ & $I_2$ & $I_3$ \\
+				\hline
+				$S' \to \cdot S, \$$ & $S' \to S\cdot, \$$ & $S \to a\cdot Ac, \$$ & $A \to b\cdot, b/c$ \\
+				$S \to \cdot aAc, \$$ &  & $A \to \cdot Abb, b/c$ &  \\
+				&  & $A \to \cdot b, b/c$ &  \\
+				\hline
+			\end{tabular}
+		\end{table}
+		\begin{table}[H]
+			\centering
+			\caption{}
+			\begin{tabular}{|c|c|c|c|}
+				\hline
+				$I_4$ & $I_5$ & $I_6$ & $I_7$ \\
+				\hline
+				$S \to aA\cdot c, \$$ & $S \to aAc\cdot, \$$ & $A \to Ab\cdot b, b/c$ & $A \to Abb\cdot, b/c$ \\
+				$A \to A\cdot bb, b/c$ &  &  &  \\
+				\hline
+			\end{tabular}
+		\end{table}
+		再对产生式进行编号：\newline
+		1. $S' \to S$\newline
+		2. $S \to aAc$\newline
+		3. $A \to Abb$\newline
+		4. $A \to b$\newline
+		从而可以得到$LR(1)$分析表：
+		\begin{table}[H]
+			\centering
+			\caption{}
+			\begin{tabular}{|c|cccc|cc|}
+				\hline
+				\multirow{2}*{状态} & \multicolumn{4}{|c|}{$ACTION$} & \multicolumn{2}{|c|}{$GOTO$} \\
+				\cline{2 - 7}
+				& $a$ & $b$ & $c$ & $\$$ & $S$ & $A$ \\
+				\hline
+				$0$ & $s2$ &  &  &  & $1$ &  \\
+				$1$ &  &  &  & $acc$ &  &  \\
+				$2$ &  & $s3$ &  &  &  & $4$ \\
+				$3$ &  & $r4$ & $r4$ &  &  &  \\
+				$4$ &  &  & $s5$ &  &  &  \\
+				$5$ &  & $s6$ &  & $r2$ &  &  \\
+				$6$ &  & $s7$ &  &  &  &  \\
+				$7$ &  & $r3$ & $r3$ &  &  &  \\
+				\hline
+			\end{tabular}
+		\end{table}
+		可见该分析表无冲突, 因此该文法是$LR(1)$文法.\newline
+		(2). 对于文法：
+		$$
+		S \to aAc
+		$$
+		$$
+		A \to bAb\ |\ b
+		$$
+		写出其增广文法：
+		$$
+		S' \to S
+		$$
+		$$
+		S \to aAc
+		$$
+		$$
+		A \to bAb\ |\ b
+		$$
+		从项$[S' \to S, \$]$构造出整个项集：
+		\begin{table}[H]
+			\centering
+			\caption{}
+			\begin{tabular}{|c|c|c|c|c|c|}
+				\hline
+				$I_0$ & $I_1$ & $I_2$ & $I_3$ & $I_4$ & $I_5$ \\
+				\hline
+				$S' \to \cdot S, \$$ & $S' \to S\cdot, \$$ & $S \to a\cdot Ac, \$$ & $A \to b\cdot Ab, c$ & $A \to b\cdot Ab, b$ & $A \to bA\cdot b, c$ \\
+				$S \to \cdot aAc, \$$ &  & $A \to \cdot bAb, c$ & $A \to b\cdot, c$ & $A \to b\cdot, b$ &  \\
+				&  & $A \to \cdot b, c$ & $A \to \cdot bAb, b$ & $A \to \cdot bAb, b$ &  \\
+				&  &  & $A \to \cdot b, b$ & $A \to \cdot b, b$ &  \\
+				\hline
+			\end{tabular}
+		\end{table}
+		\begin{table}[H]
+			\centering
+			\caption{}
+			\begin{tabular}{|c|c|c|c|c|}
+				\hline
+				$I_6$ & $I_7$ & $I_{8}$ & $I_{9}$ & $I_{10}$ \\
+				\hline
+				$A \to bAb\cdot, c$ & $A \to bA\cdot b, b$ & $A \to bAb\cdot, b$ & $S \to aA\cdot c, \$$ & $S \to aAc\cdot, \$$ \\
+				\hline
+			\end{tabular}
+		\end{table}
+		再对产生式进行编号：\newline
+		1. $S' \to S$\newline
+		2. $S \to aAc$\newline
+		3. $A \to bAb$\newline
+		4. $A \to b$\newline
+		从而可以得到$LR(1)$分析表：
+		\begin{table}[H]
+			\centering
+			\caption{}
+			\begin{tabular}{|c|cccc|cc|}
+				\hline
+				\multirow{2}*{状态} & \multicolumn{4}{|c|}{$ACTION$} & \multicolumn{2}{|c|}{$GOTO$} \\
+				\cline{2 - 7}
+				& $a$ & $b$ & $c$ & $\$$ & $S$ & $A$ \\
+				\hline
+				$0$ & $s2$ &  &  &  & $1$ &  \\
+				$1$ &  &  &  & $acc$ &  &  \\
+				$2$ &  & $s3$ &  &  &  & $9$ \\
+				$3$ &  & $s4$ & $r4$ &  &  & $5$ \\
+				$4$ &  & $s4, r4$ &  &  &  & $7$ \\
+				$5$ &  & $s6$ &  &  &  &  \\
+				$6$ &  &  & $r3$ &  &  &  \\
+				$7$ &  & $s8$ &  &  &  &  \\
+				$8$ &  & $r3$ &  &  &  &  \\
+				$9$ &  &  & $s10$ &  &  &  \\
+				$10$ &  &  &  & $r2$ &  &  \\
+				\hline
+			\end{tabular}
+		\end{table}
+		可见该分析表在$(4, b)$处发生移进-约归冲突, 因此该文法是$LR(1)$文法. 发生冲突的项集为$I_4$.
+	\end{solution}
+\end{document}
