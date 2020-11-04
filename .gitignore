@@ -1,3 +1,5 @@
 *.aux
 *.thm
 *.log
+*.gz
+*.exe
