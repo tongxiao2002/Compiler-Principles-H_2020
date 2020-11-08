@@ -1,0 +1,112 @@
+\documentclass{article}
+\usepackage{ctex}
+\usepackage[left=2cm,right=2cm,top=1.5cm,bottom=1.5cm]{geometry}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{multirow}
+\usepackage{makecell}
+\usepackage{float}
+\usepackage[thmmarks,amsmath]{ntheorem}
+\usepackage{hyperref}
+
+\begin{document}
+	\title{HW 7}
+	\author{肖桐 PB18000037}
+	\date{2020 年 11 月 8 日}
+	\maketitle
+
+	\newtheorem*{solution}{解}
+	
+	\begin{solution}\textnormal{\textbf{1.}}
+		(1). $pointer(array(3, int))$\newline
+		(2). $array(3, pointer(int))$\newline
+		(3). $pointer(array(3, int))$\newline
+		(4). $pointer(array(3, pointer(int)))$\newline
+		(5). $array(3, pointer(pointer(int)))$
+	\end{solution}
+	\begin{solution}\textnormal{\textbf{2.}}
+		翻译方案为：
+		\begin{table}[H]
+			\centering
+			\caption{翻译方案}
+			\begin{tabular}{|l|}
+				\hline
+				$P \to D\ ;\ E$ \\
+				\hline
+				$D \to D_1\ ;\ D_2\ |\ id\ :\ T\ \{addtype(id.entry, T.type);\}$ \\
+				\hline
+				$T \to list\ of\ T_1\ \{T.type = list(T_1.type);\}\ |\ char\ \{T.type = char;\}\ |\ integer\ \{T.type = integer;\}$ \\
+				\hline
+				$E \to (L)\ \{E.type = list(L.type);\}\ |\ literal\ \{E.type = char;\}$ \\
+				$\qquad |\ num\ \{E.type = integer;\}\ |\ id\ \{E.type = gettype(id.entry);\}\ |\ nil\ \{E.type = NIL;\}$ \\
+				\hline
+				$L \to E\ ,\ L_1\ \{if(E.type\ !=\ L_1.type)\{L.type = type\_error;\}\ else\{L.type = L_1.type;\}\}\ |\ E\ \{L.type = E.type;\}$ \\
+				\hline
+			\end{tabular}
+		\end{table}
+	\end{solution}
+	\begin{solution}\textnormal{\textbf{3.}}
+		(a). $(\text{pointer}(\alpha)) \times (\beta \to \gamma)$\newline
+		(b). $\beta \times (\gamma \to \delta)$\newline
+		这两个表达式最一般的合一替换为：\newline
+		$S(\alpha) \to \alpha,\ S(\beta) \to \text{pointer}(\alpha),\ S(\gamma) \to \text{pointer}(\alpha),\ S(\delta) \to \text{pointer}(\alpha)$\newline
+		得到合一表达式为：$(\text{pointer}(\alpha)) \times (\text{pointer}(\alpha) \to \text{pointer}(\alpha))$\newline
+		若将$(b)$中$\delta$换为$\alpha$, 则不存在合一替换.
+	\end{solution}
+	\begin{solution}\textnormal{\textbf{4.}}
+		记$f$类型为$\beta$, $l$类型为$\gamma$, $map$类型为$\theta$. 则可得类型推导过程如下：
+		\begin{table}[H]
+			\centering
+			\caption{类型推导过程}
+			\begin{tabular}{|c|c|c|c|}
+				\hline
+				行 & 定型断言 & 代换 & 规则 \\
+				\hline
+				$(1)$ & $f:\beta$ &  & $(Exp\ id)$ \\
+				\hline
+				$(2)$ & $l:\gamma$ &  & $(Exp\ id)$ \\
+				\hline
+				$(3)$ & $map:\theta$ &  & $(Exp\ id)$ \\
+				\hline
+				$(4)$ & $map(f, l):\delta$ & $\theta = \beta \times \gamma \to \delta$ & $(Exp\ FunCall)$ \\
+				\hline
+				$(5)$ & $null:list(\alpha_n) \to boolean$ &  & $(Exp\ Id\ Fresh)$ \\
+				\hline
+				$(6)$ & $null(l):boolean$ & $\gamma = list(\alpha_n)$ & $(Exp\ FunCall)$ \\
+				\hline
+				$(7)$ & $nil:list(\alpha_i)$ &  & $(Exp\ Id\ Fresh)$ \\
+				\hline
+				$(8)$ & $hd:list(\alpha_p) \to \alpha_p$ &  & $(Exp\ Id\ Fresh)$ \\
+				\hline
+				$(9)$ & $hd(l):\alpha_n$ & $\alpha_p = \alpha_n$ & $(Exp\ FunCall)$ \\
+				\hline
+				$(10)$ & $f(hd(l)):\eta$ & $\beta = \alpha_n \to \eta$ & $(Exp\ FunCall)$ \\
+				\hline
+				$(11)$ & $tl:list(\alpha_q) \to \alpha_q$ &  & $(Exp\ Id\ Fresh)$ \\
+				\hline
+				$(12)$ & $tl(l):list(\alpha_n)$ & $\alpha_q = \alpha_n$ & $(Exp\ FunCall)$ \\
+				\hline
+				$(13)$ & $map(f, tl(l)):\delta$ & $\gamma = \alpha \times list(\alpha_n) \to \delta$ & $(Exp\ FunCall)$ \\
+				\hline
+				$(14)$ & $cost:\alpha_r \times list(\alpha_r) \to \alpha_r$ &  & $(Exp\ Id\ Fresh)$ \\
+				\hline
+				\multirow{4}*{$(15)$} & \multirow{4}*{$cost(f(hd(l)), map(f, tl(l))):list(\alpha_r)$} & $\eta = \alpha_r$ & \multirow{4}*{$(Exp\ FunCall)$} \\
+				& & $\delta = list(\alpha_r)$ & \\
+				& & $\beta = \alpha_n \to \alpha_r$ & \\
+				& & $\theta = ((\alpha_n \to \alpha_r) \times list(\alpha_n)) \to list(\alpha_r)$ \\
+				\hline
+				$(16)$ & $if:boolean \times \alpha_s \times \alpha_s \to \alpha_s$ &  & $(Exp\ Id\ Fresh)$ \\
+				\hline
+				$(17)$ & $if(...):\alpha_r$ & $\alpha_i = \alpha_r$ & $(Exp\ FunCall)$ \\
+				\hline
+				$(18)$ & $=:\alpha_t \times \alpha_t \to \alpha_t$ &  & $(Exp\ Id\ Fresh)$ \\
+				\hline
+				$(19)$ & $map(f, l) = ...:\alpha_r$ & $\alpha_t = \alpha_r$ & $(Exp\ FunCall)$ \\
+				\hline
+			\end{tabular}
+		\end{table}
+		因此可以看出, $map$的类型为：$((\alpha_n \to \alpha_r) \times list(\alpha_n)) \to list(\alpha_r)$.\newline
+		因为$\alpha_n, \alpha_r$是未知类型的, 因此在前面加上任意符号, 可得：\newline
+		$\forall\alpha\forall\beta((\alpha \to \beta) \times list(\alpha)) \to list(\beta)$
+	\end{solution}
+\end{document}
