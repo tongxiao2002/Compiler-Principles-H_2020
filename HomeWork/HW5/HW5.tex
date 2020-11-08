@@ -1,0 +1,136 @@
+\documentclass{article}
+\usepackage{ctex}
+\usepackage[left=2cm,right=2cm,top=1.5cm,bottom=1.5cm]{geometry}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{multirow}
+\usepackage{makecell}
+\usepackage{float}
+\usepackage[thmmarks,amsmath]{ntheorem}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{fontspec}
+\setmonofont{Consolas}
+\usetikzlibrary{calc}
+
+\begin{document}
+	\title{HW5}
+	\author{肖桐 PB18000037}
+	\date{2020 年 10 月 24 日}
+	\maketitle
+
+	\newtheorem*{solution}{解}
+
+	\begin{solution}\textnormal{\textbf{1.}}
+		消除原文法的左递归后得到增广文法如下：
+		$$
+		S' \to S
+		$$
+		$$
+		S \to (L)\ |\ a
+		$$
+		$$
+		L \to S,L\ |\ S
+		$$
+		为非终结符号$L, S$增加一个综合属性$syn$和继承属性$inh$, 为终结符$a$增加一个综合属性$syn$.\newline
+		其中属性$syn$表示由当前文法符号推出的字符串的最后一位字符, 所在当前句子中的位置.\newline
+		属性$inh$表示由当前文法符号推出的字符串的第一个字符, 所在当前句子中的位置.\newline
+		则可以得到以下语法制导定义：
+		\begin{table}[H]
+			\centering
+			\caption{语法制导定义}
+			\begin{tabular}{|c|c|}
+				\hline
+				产生式 & 语法规则 \\
+				\hline
+				$S' \to S$ & $S.inh = 1$ \\
+				& $S'.syn = S.syn$ \\
+				\hline
+				$S \to (L)$ & $L.inh = S.inh + 1$ \\
+				& $S.syn = L.syn + 1$ \\
+				\hline
+				$S \to a$ & $S.syn = a.syn$ \\
+				\hline
+				$L \to S, L_1$ & $L.syn = L_1.syn$ \\
+				& $S.inh = L.inh$ \\
+				& $L_1.inh = S.syn + 2$ \\
+				\hline
+				$L \to S$ & $L.syn = S.syn$ \\
+				& $S.inh = L.inh$ \\
+				\hline
+			\end{tabular}
+		\end{table}
+		对应的翻译方案为：初始化开始符号$S.inh = 1$.
+		\begin{table}[H]
+			\centering
+			\caption{翻译方案}
+			\begin{tabular}{|l|}
+				\hline
+				$S' \to \{S.inh = 1;\}\ S\ \{S'.syn = S.syn;\}$ \\
+				\hline
+				$S \to (\ \{L.inh = S.inh + 1;\}\ L\ \{S.syn = L.syn + 1;\}\ )$ \\
+				\hline
+				$S \to a\{S.syn = a.syn;\ \textnormal{printf}(S.inh);\}$ \\
+				\hline
+				$L \to \{S.inh = L.inh;\}\ S,\ \{L_1.inh = S.syn + 2;\}\ L_1\ \{L.syn = L_1.syn;\}$ \\
+				\hline
+				$L \to \{S.inh = L.inh;\}\ S\ \{L.syn = S.syn;\}$ \\
+				\hline
+			\end{tabular}
+		\end{table}
+		预测翻译器：\newline
+		\rm{
+		\begin{lstlisting}[language = C++, numbers=left, 
+			numberstyle=\tiny, keywordstyle=\color{blue!70}, tabsize=4,
+			commentstyle=\color{red!50!green!50!blue!50}, frame=shadowbox,
+			rulesepcolor=\color{red!20!green!20!blue!20}, basicstyle=\ttfamily]
+int S'()
+{
+	int S'.syn = S(1);
+	if (lookahead == '$')
+	{
+		return 1;	//accept
+	}
+	else
+	{
+		return 0;	//error
+	}
+}
+
+int S(int S.inh)
+{
+	if (lookahead == 'a')
+	{	//产生式 S -> a
+		match('a');
+		printf(a.syn);	//S.inh = a.syn
+		return a.syn;
+	}
+	else if (lookahead == '(')
+	{	//产生式 S -> (L)
+		match('(');
+		int S.syn = L(S.inh + 1) + 1;
+		match(')');
+		return S.syn;
+	}
+	else return 0;	//error
+}
+
+int L(int L.inh)
+{
+	int S.syn = S(L.inh)
+	if (lookahead == ',')
+	{	//产生式 L -> S, L
+		match(',');
+		int L.syn = L(S.syn + 2);
+		return L.syn;
+	}
+	else
+	{	//产生式 L -> S
+		return S.syn;
+	}
+}
+		\end{lstlisting}
+		}
+	\end{solution}
+\end{document}
