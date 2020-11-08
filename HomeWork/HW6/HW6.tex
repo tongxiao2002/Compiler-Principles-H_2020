@@ -1,0 +1,149 @@
+\documentclass{article}
+\usepackage{ctex}
+\usepackage[left=2cm,right=2cm,top=1.5cm,bottom=1.5cm]{geometry}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{multirow}
+\usepackage{makecell}
+\usepackage{float}
+\usepackage[thmmarks,amsmath]{ntheorem}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{fontspec}
+\setmonofont{Consolas}
+\usetikzlibrary{calc}
+
+\begin{document}
+	\title{HW 6}
+	\author{肖桐 PB18000037}
+	\date{2020 年 11 月 1 日}
+	\maketitle
+
+	\newtheorem*{solution}{解}
+
+	\begin{solution}\textnormal{\textbf{1.}}
+		为$S, L$引入一个继承属性$inh$和一个综合属性$syn$.\newline
+		继承属性$inh$表示由当前文法符号推出的字符串的第一个字符, 所在当前句子中的位置.\newline
+		综合属性$syn$表示由当前文法符号推出的字符串的最后一位字符, 所在当前句子中的位置.\newline
+		可以得到增广文法的语法制导定义为：
+		\begin{table}[H]
+			\centering
+			\caption{语法制导定义}
+			\begin{tabular}{|c|c|}
+				\hline
+				产生式 & 语义规则 \\
+				\hline
+				$S' \to AS$ & $S.inh = A.syn$ \\
+				\hline
+				$A \to \varepsilon$ & $A.syn = 0$ \\
+				\hline
+				$S \to (BL)$ & $B.inh = S.inh + 1$ \\
+				& $L.inh = B.syn$ \\
+				& $S.syn = L.syn + 1$ \\
+				\hline
+				$B \to \varepsilon$ & $B.syn = B.inh$ \\
+				\hline
+				$S \to a$ & $S.syn = a.syn$ \\
+				& $printf(S.inh)$ \\
+				\hline
+				$L \to L_1, CS$ & $L_1.inh = L.inh$ \\
+				& $C.inh = L_1.syn + 2$ \\
+				& $S.inh = C.syn$ \\
+				& $L.syn = S.syn$ \\
+				\hline
+				$C \to \varepsilon$ & $C.syn = C.inh$ \\
+				\hline
+				$L \to S$ & $S.inh = L.inh$ \\
+				& $L.syn = S.syn$ \\
+				\hline
+			\end{tabular}
+		\end{table}
+		转化为栈操作代码为：
+		\begin{table}[H]
+			\centering
+			\caption{栈操作代码}
+			\begin{tabular}{|c|c|}
+				\hline
+				产生式 & 栈操作代码 \\
+				\hline
+				$S' \to AS$ & $val[top - 1] = val[top]$ \\
+				\hline
+				$A \to \varepsilon$ & $val[top + 1] = 0$ \\
+				\hline
+				$S \to (BL)$ & $val[top - 3] = val[top - 1] + 1$ \\
+				\hline
+				$B \to \varepsilon$ & $val[top + 1] = val[top - 2] + 1$ \\
+				\hline
+				$S \to a$ & $printf(val[top])$ \\
+				\hline
+				$L \to L_1, CS$ & $val[top - 3] = val[top]$ \\
+				\hline
+				$C \to \varepsilon$ & $val[top + 1] = val[top - 2] + 2$ \\
+				\hline
+				$L \to S$ &  \\
+				\hline
+			\end{tabular}
+		\end{table}
+	\end{solution}
+	
+	\begin{solution}\textnormal{\textbf{2.}}
+		(1). 为非终结符$P, D$引入一个综合属性$num$, 用于记录$id$的个数.\newline
+		则可以写出语法制导定义如下：
+		\begin{table}[H]
+			\centering
+			\caption{语法制导定义}
+			\begin{tabular}{|c|c|}
+				\hline
+				产生式 & 语义规则 \\
+				\hline
+				$P \to D$ & $P.num = D.num$ \\
+				& $printf(P.num)$ \\
+				\hline
+				$D \to D_1\ ;\ D_2$ & $D.num = D_1.num + D_2.num$ \\
+				\hline
+				$D \to id\ :\ T$ & $D.num = 1$ \\
+				\hline
+				$D \to proc\ id\ ;\ D_1\ ;\ S$ & $D.num = D_1.num + 1$ \\
+				\hline
+			\end{tabular}
+		\end{table}
+		(2). 为了打印每一个$id$的嵌套深度, 需要为非终结符$D$增加一个继承属性$depth$, 用于记录嵌套深度.\newline
+		可以得到语法制导定义如下：
+		\begin{table}[H]
+			\centering
+			\caption{语法制导定义}
+			\begin{tabular}{|c|c|}
+				\hline
+				产生式 & 语义规则 \\
+				\hline
+				$P \to D$ & $D.depth = 1$ \\
+				\hline
+				$D \to D_1\ ;\ D_2$ & $D_1.depth = D.depth + 1$ \\
+				& $D_2.depth = D.depth + 1$ \\
+				\hline
+				$D \to id\ :\ T$ & $printf(D.depth)$ \\
+				\hline
+				$D \to proc\ id\ ;\ D_1\ ;\ S$ & $D_1.depth = D.depth + 1$ \\
+				& $printf(D.depth)$ \\
+				\hline
+			\end{tabular}
+		\end{table}
+		对应的翻译方案为：
+		\begin{table}[H]
+			\centering
+			\caption{翻译方案}
+			\begin{tabular}{|l|}
+				\hline
+				$P \to \{D.depth = 1;\}\ D$ \\
+				\hline
+				$D \to \{D_1.depth = D.depth + 1;\}\ D_1\ ;\ \{D_2.depth = D.depth + 1;\}\ D_2$ \\
+				\hline
+				$D \to id\ \{printf(D.depth);\}\ :\ T$ \\
+				\hline
+				$D \to proc\ id\ \{printf(D.depth);\}\ ;\ \{D_1.depth = D.depth + 1;\}\ D_1\ ;\ S$ \\
+				\hline
+			\end{tabular}
+		\end{table}
+	\end{solution}
+\end{document}
